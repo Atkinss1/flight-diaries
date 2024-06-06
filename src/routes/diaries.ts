@@ -1,10 +1,10 @@
 import express from 'express';
-
+import diaryFunction from '../services/diaryService';
 const router = express.Router();
 
 router.route('/')
   .get((_req, res) => {
-    res.send('Fetching all diaries!');
+    res.send(diaryFunction.getNonSensitiveEntries());
   })
   .post((_req, res) => {
     res.send('Saving a diary!');
