@@ -1,22 +1,28 @@
 import express from 'express';
 import diaryFunction from '../services/diaryService';
 import diaryService from '../services/diaryService';
-import { DiaryRequest, DiaryEntry } from '../types';
+import toNewDiaryEntry from '../utils';
 const router = express.Router();
 
 router.route('/')
   .get((_req, res) => {
     res.send(diaryFunction.getNonSensitiveEntries());
   })
-  .post((req: DiaryRequest<DiaryEntry>, res) => {
-    const { date, weather, visibility, comment } = req.body;
-    const addedEntry = diaryService.addDiary({
-      date,
-      weather,
-      visibility,
-      comment
-    });
-    res.json(addedEntry);
+  .post((req, res) => {
+    try {
+      const newDiaryEntry = toNewDiaryEntry(req.body);
+      const addedEntry = diaryService.addDiary(newDiaryEntry);
+      res.json(addedEntry);
+    } catch (error: unknown) {
+      
+      let errorMessage = 'Something went wrong.';
+      
+      if (error instanceof Error) {
+        errorMessage += ' Error: ' + error.message;
+      }
+      res.status(400).send(errorMessage);
+     }
+    
   });
 
 router.route('/:id')
